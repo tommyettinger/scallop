@@ -124,7 +124,8 @@ public class Scallop extends ApplicationAdapter {
 		PixmapIO.PNG png = new PixmapIO.PNG();
 		png.setFlipY(false);
 		for (String s : files) {
-			FileHandle fh = Gdx.files.local(s);
+			boolean isAbsolute = s.matches(".*[/\\\\].*");
+			FileHandle fh = isAbsolute ? Gdx.files.absolute(s) : Gdx.files.local(s);
 			Pixmap source = new Pixmap(fh);
 			Pixmap dest = new Pixmap(source.getWidth() * 2, source.getHeight() * 2, Pixmap.Format.RGBA8888);
 			Pixmap dest4 = new Pixmap(source.getWidth() * 4, source.getHeight() * 4, Pixmap.Format.RGBA8888);
@@ -133,9 +134,16 @@ public class Scallop extends ApplicationAdapter {
 			scaleX(dest, dest4);
 			scaleX(dest4, dest8);
 			try {
-				png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x2.png"), dest);
-				png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x4.png"), dest4);
-				png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x8.png"), dest8);
+				if(isAbsolute) {
+					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x2.png"), dest);
+					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x4.png"), dest4);
+					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x8.png"), dest8);
+				}
+				else {
+					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x2.png"), dest);
+					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x4.png"), dest4);
+					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x8.png"), dest8);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
