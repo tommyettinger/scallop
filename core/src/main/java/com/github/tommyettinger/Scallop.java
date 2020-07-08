@@ -72,7 +72,7 @@ public class Scallop extends ApplicationAdapter {
 				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
 				D = x == 0 ? 0 : src.getPixel(x - 1, y);
 				E = src.getPixel(x, y);
-				F = x == width ? 0 :  src.getPixel(x + 1, y);
+				F = x == width ? 0 : src.getPixel(x + 1, y);
 				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
 				H = y == height ? 0 : src.getPixel(x, y + 1);
 				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
@@ -83,6 +83,28 @@ public class Scallop extends ApplicationAdapter {
 				p3 = ((y * dw + x << 1 | 1) + dw) << 2;
 
 				scale2x(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
+			}
+		}
+
+		for (int y = 2; y < dh; y ++) {
+			for (int x = 2; x < dw; x ++) {
+				int p0, p1, p2, p3, c0, c1, c2, c3;
+				c0 = pixels.getInt(p0 = (y * dw + x - 1 - dw) << 2);
+				c1 = pixels.getInt(p1 = (y * dw + x - dw) << 2);
+				c2 = pixels.getInt(p2 = ((y * dw + x - 1)) << 2);
+				c3 = pixels.getInt(p3 = ((y * dw + x)) << 2);
+				if (c0 == c3 && c1 == c2 && c0 != c1)
+					c0 = c1 = c2 = c3 = (Integer.bitCount(c0) > Integer.bitCount(c1) ? c0 : c1);
+				else if (c0 == c3 && c0 != c1 && c0 != c2)
+					c1 = c2 = c0;
+				else if (c1 == c2 && c1 != c0 && c1 != c3)
+					c0 = c3 = c1;
+
+				pixels.putInt(p0, c0);
+				pixels.putInt(p1, c1);
+				pixels.putInt(p2, c2);
+				pixels.putInt(p3, c3);
+
 			}
 		}
 	}
