@@ -19,10 +19,10 @@ public class Scallop extends ApplicationAdapter {
 
 	public static void scale2x(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
 							   int p2, int p3) {
-		dest.putInt(p0, D != 0 && ((D == B && B != F && D != H) || (E == 0 && D != 0 && B != 0)) ? D : E);
-		dest.putInt(p1, B != 0 && ((B == F && B != D && F != H) || (E == 0 && B != 0 && F != 0)) ? B : E);
-		dest.putInt(p2, H != 0 && ((D == H && D != B && H != F) || (E == 0 && D != 0 && H != 0)) ? H : E);
-		dest.putInt(p3, F != 0 && ((H == F && D != H && B != F) || (E == 0 && H != 0 && F != 0)) ? F : E);
+		dest.putInt(p0, D != 0 && ((D == B && B != F && D != H) || (E == 0 && B != 0)) ? D : E);
+		dest.putInt(p1, B != 0 && ((B == F && B != D && F != H) || (E == 0 && F != 0)) ? B : E);
+		dest.putInt(p2, H != 0 && ((H == D && D != B && H != F) || (E == 0 && D != 0)) ? H : E);
+		dest.putInt(p3, F != 0 && ((F == H && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
 	}
 
 	public static int lerp(int baseColor, int mixColor, float amount) {
