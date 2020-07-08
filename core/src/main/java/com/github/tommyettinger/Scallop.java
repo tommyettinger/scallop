@@ -86,25 +86,31 @@ public class Scallop extends ApplicationAdapter {
 			}
 		}
 
-		for (int y = 2; y < dh; y ++) {
-			for (int x = 2; x < dw; x ++) {
+		for (int y = 1; y < dh; y ++) {
+			for (int x = 1; x < dw; x ++) {
 				int p0, p1, p2, p3, c0, c1, c2, c3;
 				c0 = pixels.getInt(p0 = (y * dw + x - 1 - dw) << 2);
 				c1 = pixels.getInt(p1 = (y * dw + x - dw) << 2);
 				c2 = pixels.getInt(p2 = ((y * dw + x - 1)) << 2);
 				c3 = pixels.getInt(p3 = ((y * dw + x)) << 2);
 				if (c0 == c3 && c1 == c2 && c0 != c1)
-					c0 = c1 = c2 = c3 = (Integer.bitCount(c0) > Integer.bitCount(c1) ? c0 : c1);
+				{
+					c3 = (Integer.bitCount(c0) > Integer.bitCount(c1) ? c0 : c1);
+					pixels.putInt(p0, c3);
+					pixels.putInt(p1, c3);
+					pixels.putInt(p2, c3);
+					pixels.putInt(p3, c3);
+				}
 				else if (c0 == c3 && c0 != c1 && c0 != c2)
-					c1 = c2 = c0;
+				{
+					pixels.putInt(p1, c0);
+					pixels.putInt(p2, c0);
+				}
 				else if (c1 == c2 && c1 != c0 && c1 != c3)
-					c0 = c3 = c1;
-
-				pixels.putInt(p0, c0);
-				pixels.putInt(p1, c1);
-				pixels.putInt(p2, c2);
-				pixels.putInt(p3, c3);
-
+				{
+					pixels.putInt(p0, c1);
+					pixels.putInt(p3, c1);
+				}
 			}
 		}
 	}
