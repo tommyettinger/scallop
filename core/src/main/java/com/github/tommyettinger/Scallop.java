@@ -86,8 +86,8 @@ public class Scallop extends ApplicationAdapter {
 			}
 		}
 
-		for (int y = 1; y < dh; y ++) {
-			for (int x = 1; x < dw; x ++) {
+		for (int y = 1; y < dh; y++) {
+			for (int x = 1; x < dw; x++) {
 				int p0, p1, p2, p3, c0, c1, c2, c3;
 				c0 = pixels.getInt(p0 = (y * dw + x - 1 - dw) << 2);
 				c1 = pixels.getInt(p1 = (y * dw + x - dw) << 2);
@@ -120,20 +120,20 @@ public class Scallop extends ApplicationAdapter {
 		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
 		ByteBuffer pixels = dest.getPixels();
 
-		for (int y = 1; y < height; ++y) {
-			for (int x = 1; x < width; ++x) {
+		for (int y = 0; y <= height; ++y) {
+			for (int x = 0; x <= width; ++x) {
 				int p0, p1, p2, p3;
 				int A, B, C, D, E, F, G, H, I;
 
-				A = src.getPixel(x - 1, y - 1);
-				B = src.getPixel(x, y - 1);
-				C = src.getPixel(x + 1, y - 1);
-				D = src.getPixel(x - 1, y);
+				A = (x & y) == 0 ? 0 : src.getPixel(x - 1, y - 1);
+				B = y == 0 ? 0 : src.getPixel(x, y - 1);
+				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
+				D = x == 0 ? 0 : src.getPixel(x - 1, y);
 				E = src.getPixel(x, y);
-				F = src.getPixel(x + 1, y);
-				G = src.getPixel(x - 1, y + 1);
-				H = src.getPixel(x, y + 1);
-				I = src.getPixel(x + 1, y + 1);
+				F = x == width ? 0 : src.getPixel(x + 1, y);
+				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
+				H = y == height ? 0 : src.getPixel(x, y + 1);
+				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
 
 				p0 = (y * dw + x << 1) << 2;
 				p1 = (y * dw + x << 1 | 1) << 2;

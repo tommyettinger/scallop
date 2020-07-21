@@ -1,7 +1,8 @@
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
+mainClassName = 'com.github.tommyettinger.lwjgl3.PaletteEnforcerLauncher'
+//mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 8.0
 
@@ -23,7 +24,8 @@ run {
 	}
 }
 jar {
-	archiveFileName = "${appName}.jar"
+	archiveFileName = "PaletteEnforcer.jar"
+//	archiveFileName = "${appName}.jar"
 	dependsOn configurations.runtimeClasspath
 	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
 	manifest {
