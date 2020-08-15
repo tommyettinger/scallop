@@ -1,18 +1,47 @@
 apply plugin: 'application'
+import org.gradle.internal.os.OperatingSystem
 
-sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'com.github.tommyettinger.lwjgl3.PaletteEnforcerLauncher'
-//mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
+sourceSets.main.resources.srcDirs += [rootProject.file('assets').path ]
+//mainClassName = 'com.github.tommyettinger.lwjgl3.PaletteEnforcerLauncher'
+mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 8.0
 
 dependencies {
 	implementation project(':core')
-	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-}
+	implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
+		//exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio, leaves ARM files
+		exclude group: 'org.lwjgl' //// needs strict dependencies below, removes pointless ARM files
+		exclude group: 'org.jcraft', module: 'jorbis' // removes audio
+	}
+	implementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop")
 
-import org.gradle.internal.os.OperatingSystem
+	implementation 'org.lwjgl:lwjgl:3.2.3'
+	implementation 'org.lwjgl:lwjgl-glfw:3.2.3'
+	implementation 'org.lwjgl:lwjgl-opengl:3.2.3'
+//	implementation 'org.lwjgl:lwjgl-openal:3.2.3' //uncomment these lines if you want audio
+	implementation 'org.lwjgl:lwjgl-jemalloc:3.2.3'
+	implementation 'org.lwjgl:lwjgl:3.2.3:natives-windows'
+	implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-windows'
+	implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-windows'
+//	implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-windows'
+	implementation 'org.lwjgl:lwjgl-jemalloc:3.2.3:natives-windows'
+	implementation 'org.lwjgl:lwjgl:3.2.3:natives-windows-x86'
+	implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-windows-x86'
+	implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-windows-x86'
+//	implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-windows-x86'
+	implementation 'org.lwjgl:lwjgl-jemalloc:3.2.3:natives-windows-x86'
+	implementation 'org.lwjgl:lwjgl:3.2.3:natives-linux'
+	implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-linux'
+	implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-linux'
+//	implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-linux'
+	implementation 'org.lwjgl:lwjgl-jemalloc:3.2.3:natives-linux'
+	implementation 'org.lwjgl:lwjgl:3.2.3:natives-macos'
+	implementation 'org.lwjgl:lwjgl-glfw:3.2.3:natives-macos'
+	implementation 'org.lwjgl:lwjgl-opengl:3.2.3:natives-macos'
+//	implementation 'org.lwjgl:lwjgl-openal:3.2.3:natives-macos'
+	implementation 'org.lwjgl:lwjgl-jemalloc:3.2.3:natives-macos'
+}
 
 run {
 	workingDir = rootProject.file('assets').path
@@ -24,8 +53,8 @@ run {
 	}
 }
 jar {
-	archiveFileName = "PaletteEnforcer.jar"
-//	archiveFileName = "${appName}.jar"
+//	archiveFileName = "PaletteEnforcer.jar"
+	archiveFileName = "${appName}.jar"
 	dependsOn configurations.runtimeClasspath
 	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
 	manifest {

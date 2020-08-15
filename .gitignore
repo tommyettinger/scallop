@@ -68,3 +68,6 @@ nb-configuration.xml
 *~
 *.*#
 *#*#
+
+package/*.zip
+package/**/*.jar
