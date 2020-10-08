@@ -24,9 +24,9 @@ public class Scallop extends ApplicationAdapter {
 		dest.putInt(p2, H != 0 && ((H == D && D != B && H != F) || (E == 0 && D != 0)) ? H : E);
 		dest.putInt(p3, F != 0 && ((F == H && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
 	}
-	
+
 	public static void scale3p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
-						   int p2, int p3, int p4, int p5, int p6, int p7, int p8) {
+							   int p2, int p3, int p4, int p5, int p6, int p7, int p8) {
 		dest.putInt(p0, D != 0 && ((D == B && B != F && D != H) || (E == 0 && B != 0)) ? D : E);
 		dest.putInt(p1, B != 0 && (((D == B && B != F && D != H && E != C) || (B == F && B != D && F != H && E != A)) || (E == 0 && (D != 0 || F != 0))) ? B : E);
 		dest.putInt(p2, B != 0 && ((B == F && B != D && F != H) || (E == 0 && F != 0)) ? B : E);
@@ -36,42 +36,15 @@ public class Scallop extends ApplicationAdapter {
 		dest.putInt(p6, H != 0 && ((D == H && D != B && H != F) || (E == 0 && D != 0)) ? H : E);
 		dest.putInt(p7, H != 0 && (((D == H && D != B && H != F && E != I) || (H == F && D != H && B != F && E != G)) || (E == 0 && (D != 0 || F != 0))) ? H : E);
 		dest.putInt(p8, F != 0 && ((H == F && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
-		
 	}
 
-	public static int lerp(int baseColor, int mixColor, float amount) {
-		if ((baseColor & 0x80) == 0)
-			return mixColor;
-		if ((mixColor & 0x80) == 0)
-			return baseColor;
-		final float i = 1f - amount;
-		final int r = (int) ((baseColor >>> 24) * i + (mixColor >>> 24) * amount), g = (int) ((baseColor >>> 16 & 0xFF) * i
-				+ (mixColor >>> 16 & 0xFF) * amount), b = (int) ((baseColor >>> 8 & 0xFF) * i + (mixColor >>> 8 & 0xFF) * amount);
-		return r << 24 | g << 16 | b << 8 | 0xFF;
+	public static int brightness(int rgba) {
+		int r = rgba >>> 23 & 0x1FE;
+		int g = rgba >>> 14 & 0x3FC;
+		int b = rgba >>> 8 & 0xFF;
+		return (r + g + b) * (rgba & 0xFF);
 	}
-
-	public static void scale2k(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
-							   int p2, int p3) {
-		if (D == B && B != F && D != H) {
-			if (B == C && D == G) {
-				if (A != E) {
-					dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-					dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
-					dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
-				}
-			} else if (B == C) {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-				dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
-			} else if (D == G) {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-				dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
-			} else {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.5f));
-			}
-		}
-	}
-
-	public static void scaleP(Pixmap src, Pixmap dest) {
+	public static void scale2(Pixmap src, Pixmap dest) {
 
 		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
 		ByteBuffer pixels = dest.getPixels();
@@ -109,7 +82,7 @@ public class Scallop extends ApplicationAdapter {
 				c3 = pixels.getInt(p3 = ((y * dw + x)) << 2);
 				if (c0 == c3 && c1 == c2 && c0 != c1)
 				{
-					c3 = (Integer.bitCount(c0) > Integer.bitCount(c1) ? c0 : c1);
+					c3 = (brightness(c0) > brightness(c1) ? c0 : c1);
 					pixels.putInt(p0, c3);
 					pixels.putInt(p1, c3);
 					pixels.putInt(p2, c3);
@@ -128,7 +101,7 @@ public class Scallop extends ApplicationAdapter {
 			}
 		}
 	}
-	public static void scaleP3(Pixmap src, Pixmap dest) {
+	public static void scale3(Pixmap src, Pixmap dest) {
 
 		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
 		ByteBuffer pixels = dest.getPixels();
@@ -171,7 +144,7 @@ public class Scallop extends ApplicationAdapter {
 				c3 = pixels.getInt(p3 = ((y * dw + x)) << 2);
 				if (c0 == c3 && c1 == c2 && c0 != c1)
 				{
-					c3 = (Integer.bitCount(c0) > Integer.bitCount(c1) ? c0 : c1);
+					c3 = (brightness(c0) > brightness(c1) ? c0 : c1);
 					pixels.putInt(p0, c3);
 					pixels.putInt(p1, c3);
 					pixels.putInt(p2, c3);
@@ -191,6 +164,39 @@ public class Scallop extends ApplicationAdapter {
 		}
 	}
 
+
+	public static int lerp(int baseColor, int mixColor, float amount) {
+		if ((baseColor & 0x80) == 0)
+			return mixColor;
+		if ((mixColor & 0x80) == 0)
+			return baseColor;
+		final float i = 1f - amount;
+		final int r = (int) ((baseColor >>> 24) * i + (mixColor >>> 24) * amount), g = (int) ((baseColor >>> 16 & 0xFF) * i
+				+ (mixColor >>> 16 & 0xFF) * amount), b = (int) ((baseColor >>> 8 & 0xFF) * i + (mixColor >>> 8 & 0xFF) * amount);
+		return r << 24 | g << 16 | b << 8 | 0xFF;
+	}
+
+	public static void scale2k(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
+							   int p2, int p3) {
+		if (D == B && B != F && D != H) {
+			if (B == C && D == G) {
+				if (A != E) {
+					dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+					dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
+					dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
+				}
+			} else if (B == C) {
+				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+				dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
+			} else if (D == G) {
+				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+				dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
+			} else {
+				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.5f));
+			}
+		}
+	}
+	
 	public static void scaleK(Pixmap src, Pixmap dest) {
 
 		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
@@ -238,11 +244,11 @@ public class Scallop extends ApplicationAdapter {
 			Pixmap dest4 = new Pixmap(source.getWidth() * 4, source.getHeight() * 4, Pixmap.Format.RGBA8888);
 			Pixmap dest6 = new Pixmap(source.getWidth() * 6, source.getHeight() * 6, Pixmap.Format.RGBA8888);
 			Pixmap dest8 = new Pixmap(source.getWidth() * 8, source.getHeight() * 8, Pixmap.Format.RGBA8888);
-			scaleP(source, dest);
-			scaleP3(source, dest3);
-			scaleP(dest, dest4);
-			scaleP3(dest, dest6);
-			scaleP(dest4, dest8);
+			scale2(source, dest);
+			scale3(source, dest3);
+			scale2(dest, dest4);
+			scale3(dest, dest6);
+			scale2(dest4, dest8);
 			try {
 				if(isAbsolute) {
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x2.png"), dest);
