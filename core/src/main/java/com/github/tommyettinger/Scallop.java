@@ -5,16 +5,29 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
+import com.github.tommyettinger.anim8.PaletteReducer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Scallop extends ApplicationAdapter {
-	public String[] files;
-
+	public Array<String> files;
+	public PaletteReducer palette;
 	public Scallop(String[] filenames) {
-		files = filenames;
+		files = new Array<>(filenames);
+		IntArray colors = new IntArray(256);
+		while (files.notEmpty() && files.first().startsWith("-")){
+			String fn = files.removeIndex(0);
+			colors.add(Integer.parseUnsignedInt(fn.substring(fn.startsWith("-0x") ? 3 : 1), 16));
+		}
+		if(colors.notEmpty())
+			palette = new PaletteReducer(colors.toArray());
+		else {
+			palette = null;
+		}
 	}
 
 	public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
@@ -231,7 +244,14 @@ public class Scallop extends ApplicationAdapter {
 			}
 		}
 	}
+	
+	public static Pixmap load(String s) {
+		boolean isAbsolute = s.matches(".*[/\\\\].*");
+		FileHandle fh = isAbsolute ? Gdx.files.absolute(s) : Gdx.files.local(s);
+		return new Pixmap(fh);
 
+	}
+	
 	public void create() {
 		PixmapIO.PNG png = new PixmapIO.PNG();
 		png.setFlipY(false);
@@ -249,8 +269,18 @@ public class Scallop extends ApplicationAdapter {
 			scale2(dest, dest4);
 			scale3(dest, dest6);
 			scale2(dest4, dest8);
+			if(palette != null){
+				palette.setDitherStrength(0.75f);
+				palette.reduceScatter(source);
+				palette.reduceScatter(dest);
+				palette.reduceScatter(dest3);
+				palette.reduceScatter(dest4);
+				palette.reduceScatter(dest6);
+				palette.reduceScatter(dest8);
+			}
 			try {
 				if(isAbsolute) {
+					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x1.png"), source);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x2.png"), dest);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x3.png"), dest3);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x4.png"), dest4);
@@ -258,6 +288,7 @@ public class Scallop extends ApplicationAdapter {
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x8.png"), dest8);
 				}
 				else {
+					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x1.png"), source);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x2.png"), dest);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x3.png"), dest3);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x4.png"), dest4);
