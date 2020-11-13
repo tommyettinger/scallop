@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.IntSet;
 import com.github.tommyettinger.anim8.PaletteReducer;
 
 import java.io.IOException;
@@ -18,13 +19,17 @@ public class Scallop extends ApplicationAdapter {
 	public PaletteReducer palette;
 	public Scallop(String[] filenames) {
 		files = new Array<>(filenames);
-		IntArray colors = new IntArray(256);
+		IntSet colors = new IntSet(256);
+		colors.add(0);
 		while (files.notEmpty() && files.first().startsWith("-")){
 			String fn = files.removeIndex(0);
-			colors.add(Integer.parseUnsignedInt(fn.substring(fn.startsWith("-0x") ? 3 : 1), 16));
+			if(fn.startsWith("-0x"))
+				colors.add(Integer.parseUnsignedInt(fn.substring(3, 9), 16) << 8 | 255);
+			else
+				colors.add(Integer.parseUnsignedInt(fn.substring(1, 7), 16) << 8 | 255);
 		}
 		if(colors.notEmpty())
-			palette = new PaletteReducer(colors.toArray());
+			palette = new PaletteReducer(colors.iterator().toArray().items);
 		else {
 			palette = null;
 		}
