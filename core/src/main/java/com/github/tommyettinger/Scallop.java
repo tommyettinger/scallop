@@ -28,7 +28,7 @@ public class Scallop extends ApplicationAdapter {
 			else
 				colors.add(Integer.parseUnsignedInt(fn.substring(1, 7), 16) << 8 | 255);
 		}
-		if(colors.notEmpty())
+		if(colors.size > 1)
 			palette = new PaletteReducer(colors.iterator().toArray().items);
 		else {
 			palette = null;
