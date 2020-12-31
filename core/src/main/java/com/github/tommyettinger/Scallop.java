@@ -6,14 +6,12 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.github.tommyettinger.anim8.PaletteReducer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Scallop extends ApplicationAdapter {
 	public Array<String> files;
 	public PaletteReducer palette;
@@ -56,12 +54,16 @@ public class Scallop extends ApplicationAdapter {
 		dest.putInt(p8, F != 0 && ((H == F && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
 	}
 
-	public static int brightness(int rgba) {
-		int r = rgba >>> 23 & 0x1FE;
-		int g = rgba >>> 14 & 0x3FC;
-		int b = rgba >>> 8 & 0xFF;
-		return (r + g + b) * (rgba & 0xFF);
+	public static double brightness(int rgba) {
+		return PaletteReducer.IPT[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
 	}
+//
+//	public static int brightness(int rgba) {
+//		int r = rgba >>> 23 & 0x1FE;
+//		int g = rgba >>> 14 & 0x3FC;
+//		int b = rgba >>> 8 & 0xFF;
+//		return (r + g + b) * (rgba & 0xFF);
+//	}
 	public static void scale2(Pixmap src, Pixmap dest) {
 
 		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
@@ -194,61 +196,61 @@ public class Scallop extends ApplicationAdapter {
 		return r << 24 | g << 16 | b << 8 | 0xFF;
 	}
 
-	public static void scale2k(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
-							   int p2, int p3) {
-		if (D == B && B != F && D != H) {
-			if (B == C && D == G) {
-				if (A != E) {
-					dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-					dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
-					dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
-				}
-			} else if (B == C) {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-				dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
-			} else if (D == G) {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
-				dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
-			} else {
-				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.5f));
-			}
-		}
-	}
-	
-	public static void scaleK(Pixmap src, Pixmap dest) {
-
-		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
-		ByteBuffer pixels = dest.getPixels();
-
-		for (int y = 0; y <= height; ++y) {
-			for (int x = 0; x <= width; ++x) {
-				int p0, p1, p2, p3;
-				int A, B, C, D, E, F, G, H, I;
-
-				A = (x & y) == 0 ? 0 : src.getPixel(x - 1, y - 1);
-				B = y == 0 ? 0 : src.getPixel(x, y - 1);
-				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
-				D = x == 0 ? 0 : src.getPixel(x - 1, y);
-				E = src.getPixel(x, y);
-				F = x == width ? 0 : src.getPixel(x + 1, y);
-				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
-				H = y == height ? 0 : src.getPixel(x, y + 1);
-				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
-
-				p0 = (y * dw + x << 1) << 2;
-				p1 = (y * dw + x << 1 | 1) << 2;
-				p2 = ((y * dw + x << 1) + dw) << 2;
-				p3 = ((y * dw + x << 1 | 1) + dw) << 2;
-
-				scale2p(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
-				
-				scale2k(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
-				scale2k(pixels, G, D, A, H, E, B, I, F, C, p2, p0, p3, p1);
-				scale2k(pixels, I, H, G, F, E, D, C, B, A, p3, p2, p1, p0);
-				scale2k(pixels, C, F, I, B, E, H, A, D, G, p1, p3, p0, p2);
-			}
-		}
-	}
+//	public static void scale2k(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
+//							   int p2, int p3) {
+//		if (D == B && B != F && D != H) {
+//			if (B == C && D == G) {
+//				if (A != E) {
+//					dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+//					dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
+//					dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
+//				}
+//			} else if (B == C) {
+//				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+//				dest.putInt(p1, lerp(D, dest.getInt(p1), 0.25f));
+//			} else if (D == G) {
+//				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.75f));
+//				dest.putInt(p2, lerp(D, dest.getInt(p2), 0.25f));
+//			} else {
+//				dest.putInt(p0, lerp(D, dest.getInt(p0), 0.5f));
+//			}
+//		}
+//	}
+//
+//	public static void scaleK(Pixmap src, Pixmap dest) {
+//
+//		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
+//		ByteBuffer pixels = dest.getPixels();
+//
+//		for (int y = 0; y <= height; ++y) {
+//			for (int x = 0; x <= width; ++x) {
+//				int p0, p1, p2, p3;
+//				int A, B, C, D, E, F, G, H, I;
+//
+//				A = (x & y) == 0 ? 0 : src.getPixel(x - 1, y - 1);
+//				B = y == 0 ? 0 : src.getPixel(x, y - 1);
+//				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
+//				D = x == 0 ? 0 : src.getPixel(x - 1, y);
+//				E = src.getPixel(x, y);
+//				F = x == width ? 0 : src.getPixel(x + 1, y);
+//				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
+//				H = y == height ? 0 : src.getPixel(x, y + 1);
+//				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
+//
+//				p0 = (y * dw + x << 1) << 2;
+//				p1 = (y * dw + x << 1 | 1) << 2;
+//				p2 = ((y * dw + x << 1) + dw) << 2;
+//				p3 = ((y * dw + x << 1 | 1) + dw) << 2;
+//
+//				scale2p(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
+//
+//				scale2k(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
+//				scale2k(pixels, G, D, A, H, E, B, I, F, C, p2, p0, p3, p1);
+//				scale2k(pixels, I, H, G, F, E, D, C, B, A, p3, p2, p1, p0);
+//				scale2k(pixels, C, F, I, B, E, H, A, D, G, p1, p3, p0, p2);
+//			}
+//		}
+//	}
 	
 	public static Pixmap load(String s) {
 		boolean isAbsolute = s.matches(".*[/\\\\].*");
@@ -275,7 +277,7 @@ public class Scallop extends ApplicationAdapter {
 			scale3(dest, dest6);
 			scale2(dest4, dest8);
 			if(palette != null){
-				palette.setDitherStrength(0.75f);
+				palette.setDitherStrength(0.5f);
 				palette.reduceScatter(source);
 				palette.reduceScatter(dest);
 				palette.reduceScatter(dest3);
