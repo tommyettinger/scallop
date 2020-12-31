@@ -12,6 +12,8 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static com.github.tommyettinger.anim8.PaletteReducer.IPT;
+
 public class Scallop extends ApplicationAdapter {
 	public Array<String> files;
 	public PaletteReducer palette;
@@ -33,29 +35,49 @@ public class Scallop extends ApplicationAdapter {
 		}
 	}
 
-	public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
-							   int p2, int p3) {
-		dest.putInt(p0, D != 0 && ((D == B && B != F && D != H) || (E == 0 && B != 0)) ? D : E);
-		dest.putInt(p1, B != 0 && ((B == F && B != D && F != H) || (E == 0 && F != 0)) ? B : E);
-		dest.putInt(p2, H != 0 && ((H == D && D != B && H != F) || (E == 0 && D != 0)) ? H : E);
-		dest.putInt(p3, F != 0 && ((F == H && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
+	public static boolean different(int color1, int color2) {
+		if (((color1 ^ color2) & 0x80) == 0x80) return true;
+		final int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
+				indexB = (color2 >>> 17 & 0x7C00) | (color2 >>> 14 & 0x3E0) | (color2 >>> 11 & 0x1F);
+		final double
+				i = (IPT[0][indexA] - IPT[0][indexB]) * 3.0,
+				p = IPT[1][indexA] - IPT[1][indexB],
+				t = IPT[2][indexA] - IPT[2][indexB];
+		return (i * i + p * p + t * t) > 0.0125;
 	}
+
+		public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
+							   int p2, int p3) {
+		dest.putInt(p0, D != 0 && ((!different(D, B) && different(B, F) && different(D, H)) || (E == 0 && B != 0)) ? D : E);
+		dest.putInt(p1, B != 0 && ((!different(B, F) && different(B, D) && different(F, H)) || (E == 0 && F != 0)) ? B : E);
+		dest.putInt(p2, H != 0 && ((!different(H, D) && different(D, B) && different(H, F)) || (E == 0 && D != 0)) ? H : E);
+		dest.putInt(p3, F != 0 && ((!different(F, H) && different(D, H) && different(B, F)) || (E == 0 && H != 0)) ? F : E);
+	}
+
+//	public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
+//							   int p2, int p3) {
+//		dest.putInt(p0, D != 0 && (((D&0xF0F0F0F0) == (B&0xF0F0F0F0) && (B&0xF0F0F0F0) != (F&0xF0F0F0F0) && (D&0xF0F0F0F0) != (H&0xF0F0F0F0)) || (E == 0 && B != 0)) ? D : E);
+//		dest.putInt(p1, B != 0 && (((B&0xF0F0F0F0) == (F&0xF0F0F0F0) && (B&0xF0F0F0F0) != (D&0xF0F0F0F0) && (F&0xF0F0F0F0) != (H&0xF0F0F0F0)) || (E == 0 && F != 0)) ? B : E);
+//		dest.putInt(p2, H != 0 && (((H&0xF0F0F0F0) == (D&0xF0F0F0F0) && (D&0xF0F0F0F0) != (B&0xF0F0F0F0) && (H&0xF0F0F0F0) != (F&0xF0F0F0F0)) || (E == 0 && D != 0)) ? H : E);
+//		dest.putInt(p3, F != 0 && (((F&0xF0F0F0F0) == (H&0xF0F0F0F0) && (D&0xF0F0F0F0) != (H&0xF0F0F0F0) && (B&0xF0F0F0F0) != (F&0xF0F0F0F0)) || (E == 0 && H != 0)) ? F : E);
+//	}
+
 
 	public static void scale3p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
 							   int p2, int p3, int p4, int p5, int p6, int p7, int p8) {
-		dest.putInt(p0, D != 0 && ((D == B && B != F && D != H) || (E == 0 && B != 0)) ? D : E);
-		dest.putInt(p1, B != 0 && (((D == B && B != F && D != H && E != C) || (B == F && B != D && F != H && E != A)) || (E == 0 && (D != 0 || F != 0))) ? B : E);
-		dest.putInt(p2, B != 0 && ((B == F && B != D && F != H) || (E == 0 && F != 0)) ? B : E);
-		dest.putInt(p3, D != 0 && (((D == B && B != F && D != H && E != G) || (D == H && D != B && H != F && E != A)) || (E == 0 && (B != 0 || H != 0))) ? D : E);
+		dest.putInt(p0, D != 0 && ((!different(D, B) && different(B, F) && different(D, H)) || (E == 0 && B != 0)) ? D : E);
+		dest.putInt(p1, B != 0 && (((!different(D, B) && different(B, F) && different(D, H) && different(E, C)) || (!different(B, F) && different(B, D) && different(F, H) && different(E, A))) || (E == 0 && (D != 0 || F != 0))) ? B : E);
+		dest.putInt(p2, B != 0 && ((!different(B, F) && different(B, D) && different(F, H)) || (E == 0 && F != 0)) ? B : E);
+		dest.putInt(p3, D != 0 && (((!different(D, B) && different(B, F) && different(D, H) && different(E, G)) || (!different(D, H) && different(D, B) && different(H, F) && different(E, A))) || (E == 0 && (B != 0 || H != 0))) ? D : E);
 		dest.putInt(p4, E);
-		dest.putInt(p5, F != 0 && (((B == F && B != D && F != H && E != I) || (H == F && D != H && B != F && E != C)) || (E == 0 && (B != 0 || H != 0))) ? F : E);
-		dest.putInt(p6, H != 0 && ((D == H && D != B && H != F) || (E == 0 && D != 0)) ? H : E);
-		dest.putInt(p7, H != 0 && (((D == H && D != B && H != F && E != I) || (H == F && D != H && B != F && E != G)) || (E == 0 && (D != 0 || F != 0))) ? H : E);
-		dest.putInt(p8, F != 0 && ((H == F && D != H && B != F) || (E == 0 && H != 0)) ? F : E);
+		dest.putInt(p5, F != 0 && (((!different(B, F) && different(B, D) && different(F, H) && different(E, I)) || (!different(H, F) && different(D, H) && different(B, F) && different(E, C))) || (E == 0 && (B != 0 || H != 0))) ? F : E);
+		dest.putInt(p6, H != 0 && ((!different(D, H) && different(D, B) && different(H, F)) || (E == 0 && D != 0)) ? H : E);
+		dest.putInt(p7, H != 0 && (((!different(D, H) && different(D, B) && different(H, F) && different(E, I)) || (!different(H, F) && different(D, H) && different(B, F) && different(E, G))) || (E == 0 && (D != 0 || F != 0))) ? H : E);
+		dest.putInt(p8, F != 0 && ((!different(H, F) && different(D, H) && different(B, F)) || (E == 0 && H != 0)) ? F : E);
 	}
 
 	public static double brightness(int rgba) {
-		return PaletteReducer.IPT[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
+		return IPT[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
 	}
 //
 //	public static int brightness(int rgba) {
@@ -74,7 +96,7 @@ public class Scallop extends ApplicationAdapter {
 				int p0, p1, p2, p3;
 				int A, B, C, D, E, F, G, H, I;
 
-				A = (x & y) == 0 ? 0 : src.getPixel(x - 1, y - 1);
+				A = x == 0 || y == 0 ? 0 : src.getPixel(x - 1, y - 1);
 				B = y == 0 ? 0 : src.getPixel(x, y - 1);
 				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
 				D = x == 0 ? 0 : src.getPixel(x - 1, y);
@@ -131,7 +153,7 @@ public class Scallop extends ApplicationAdapter {
 				int p0, p1, p2, p3, p4, p5, p6, p7, p8;
 				int A, B, C, D, E, F, G, H, I;
 
-				A = (x & y) == 0 ? 0 : src.getPixel(x - 1, y - 1);
+				A = x == 0 || y == 0 ? 0 : src.getPixel(x - 1, y - 1);
 				B = y == 0 ? 0 : src.getPixel(x, y - 1);
 				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
 				D = x == 0 ? 0 : src.getPixel(x - 1, y);
