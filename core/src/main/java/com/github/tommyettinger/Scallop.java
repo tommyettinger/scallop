@@ -207,17 +207,17 @@ public class Scallop extends ApplicationAdapter {
 	}
 
 
-	public static int lerp(int baseColor, int mixColor, float amount) {
-		if ((baseColor & 0x80) == 0)
-			return mixColor;
-		if ((mixColor & 0x80) == 0)
-			return baseColor;
-		final float i = 1f - amount;
-		final int r = (int) ((baseColor >>> 24) * i + (mixColor >>> 24) * amount), g = (int) ((baseColor >>> 16 & 0xFF) * i
-				+ (mixColor >>> 16 & 0xFF) * amount), b = (int) ((baseColor >>> 8 & 0xFF) * i + (mixColor >>> 8 & 0xFF) * amount);
-		return r << 24 | g << 16 | b << 8 | 0xFF;
-	}
-
+//	public static int lerp(int baseColor, int mixColor, float amount) {
+//		if ((baseColor & 0x80) == 0)
+//			return mixColor;
+//		if ((mixColor & 0x80) == 0)
+//			return baseColor;
+//		final float i = 1f - amount;
+//		final int r = (int) ((baseColor >>> 24) * i + (mixColor >>> 24) * amount), g = (int) ((baseColor >>> 16 & 0xFF) * i
+//				+ (mixColor >>> 16 & 0xFF) * amount), b = (int) ((baseColor >>> 8 & 0xFF) * i + (mixColor >>> 8 & 0xFF) * amount);
+//		return r << 24 | g << 16 | b << 8 | 0xFF;
+//	}
+//
 //	public static void scale2k(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
 //							   int p2, int p3) {
 //		if (D == B && B != F && D != H) {
@@ -288,20 +288,20 @@ public class Scallop extends ApplicationAdapter {
 			boolean isAbsolute = s.matches(".*[/\\\\].*");
 			FileHandle fh = isAbsolute ? Gdx.files.absolute(s) : Gdx.files.local(s);
 			Pixmap source = new Pixmap(fh);
-			Pixmap dest = new Pixmap(source.getWidth() * 2, source.getHeight() * 2, Pixmap.Format.RGBA8888);
+			Pixmap dest2 = new Pixmap(source.getWidth() * 2, source.getHeight() * 2, Pixmap.Format.RGBA8888);
 			Pixmap dest3 = new Pixmap(source.getWidth() * 3, source.getHeight() * 3, Pixmap.Format.RGBA8888);
 			Pixmap dest4 = new Pixmap(source.getWidth() * 4, source.getHeight() * 4, Pixmap.Format.RGBA8888);
 			Pixmap dest6 = new Pixmap(source.getWidth() * 6, source.getHeight() * 6, Pixmap.Format.RGBA8888);
 			Pixmap dest8 = new Pixmap(source.getWidth() * 8, source.getHeight() * 8, Pixmap.Format.RGBA8888);
-			scale2(source, dest);
+			scale2(source, dest2);
 			scale3(source, dest3);
-			scale2(dest, dest4);
-			scale3(dest, dest6);
+			scale2(dest2, dest4);
+			scale3(dest2, dest6);
 			scale2(dest4, dest8);
 			if(palette != null){
-				palette.setDitherStrength(0.5f);
+//				palette.setDitherStrength(0.5f);
 				palette.reduceScatter(source);
-				palette.reduceScatter(dest);
+				palette.reduceScatter(dest2);
 				palette.reduceScatter(dest3);
 				palette.reduceScatter(dest4);
 				palette.reduceScatter(dest6);
@@ -310,7 +310,7 @@ public class Scallop extends ApplicationAdapter {
 			try {
 				if(isAbsolute) {
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x1.png"), source);
-					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x2.png"), dest);
+					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x2.png"), dest2);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x3.png"), dest3);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x4.png"), dest4);
 					png.write(Gdx.files.absolute(fh.pathWithoutExtension() + "-x6.png"), dest6);
@@ -318,7 +318,7 @@ public class Scallop extends ApplicationAdapter {
 				}
 				else {
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x1.png"), source);
-					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x2.png"), dest);
+					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x2.png"), dest2);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x3.png"), dest3);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x4.png"), dest4);
 					png.write(Gdx.files.local(fh.pathWithoutExtension() + "-x6.png"), dest6);
@@ -328,7 +328,7 @@ public class Scallop extends ApplicationAdapter {
 				e.printStackTrace();
 			} finally {
 				source.dispose();
-				dest.dispose();
+				dest2.dispose();
 				dest3.dispose();
 				dest4.dispose();
 				dest6.dispose();
