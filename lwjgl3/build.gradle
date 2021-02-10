@@ -1,7 +1,6 @@
 apply plugin: 'application'
 import org.gradle.internal.os.OperatingSystem
 
-sourceSets.main.resources.srcDirs += [rootProject.file('assets').path ]
 //mainClassName = 'com.github.tommyettinger.lwjgl3.PaletteEnforcerLauncher'
 mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
@@ -17,7 +16,6 @@ dependencies {
 }
 
 run {
-	workingDir = rootProject.file('assets').path
 	setIgnoreExitValue(true)
 	
 	if (OperatingSystem.current() == OperatingSystem.MAC_OS) {

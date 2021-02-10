@@ -12,7 +12,7 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import static com.github.tommyettinger.anim8.PaletteReducer.IPT;
+import static com.github.tommyettinger.anim8.PaletteReducer.OKLAB;
 
 public class Scallop extends ApplicationAdapter {
 	public Array<String> files;
@@ -40,10 +40,10 @@ public class Scallop extends ApplicationAdapter {
 		final int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
 				indexB = (color2 >>> 17 & 0x7C00) | (color2 >>> 14 & 0x3E0) | (color2 >>> 11 & 0x1F);
 		final double
-				i = (IPT[0][indexA] - IPT[0][indexB]) * 3.0,
-				p = IPT[1][indexA] - IPT[1][indexB],
-				t = IPT[2][indexA] - IPT[2][indexB];
-		return (i * i + p * p + t * t) > 0.0125;
+				L = OKLAB[0][indexA] - OKLAB[0][indexB],
+				A = OKLAB[1][indexA] - OKLAB[1][indexB],
+				B = OKLAB[2][indexA] - OKLAB[2][indexB];
+		return (L * L + A * A + B * B) >= 0.01;
 	}
 
 		public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
@@ -77,7 +77,7 @@ public class Scallop extends ApplicationAdapter {
 	}
 
 	public static double brightness(int rgba) {
-		return IPT[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
+		return OKLAB[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
 	}
 //
 //	public static int brightness(int rgba) {
