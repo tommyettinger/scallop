@@ -4,11 +4,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectSet;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,8 +52,8 @@ public class AtlasScaler extends ApplicationAdapter {
             FileHandle original = load(name);
             if(original == null) continue;
             String text = original.readString("UTF8");
-            TextureAtlas atlas = new TextureAtlas(original);
-            ObjectSet<Texture> textures = atlas.getTextures();
+            TextureAtlas.TextureAtlasData atlas = new TextureAtlas.TextureAtlasData(original, original.parent(), false);
+            Array<TextureAtlas.TextureAtlasData.Page> pages = atlas.getPages();
             for (int n : new int[]{2, 3, 4, 6, 8}) {
                 String outputName = (original.pathWithoutExtension() + "-x" + n + ".atlas");
                 FileHandle output;
@@ -65,8 +62,8 @@ public class AtlasScaler extends ApplicationAdapter {
                 else
                     output = Gdx.files.absolute(outputName);
                 String working = text;
-                for(Texture tex : textures){
-                    FileHandle th = ((FileTextureData)tex.getTextureData()).getFileHandle();
+                for(TextureAtlas.TextureAtlasData.Page p : pages){
+                    FileHandle th = p.textureFile;
                     working = working.replaceAll(Pattern.quote(th.name()), th.nameWithoutExtension() + "-x" + n + "." + th.extension());
                 }
                 Matcher matcher = pairs.matcher(working);
@@ -128,7 +125,8 @@ public class AtlasScaler extends ApplicationAdapter {
 
             }
         }
-
-        Gdx.app.exit();
+//        Gdx.app.postRunnable(() -> {
+//            System.exit(0);
+//        });
     }
 }

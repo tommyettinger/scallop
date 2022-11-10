@@ -33,6 +33,12 @@ public class Scallop extends ApplicationAdapter {
 		else {
 			palette = null;
 		}
+		Array.ArrayIterator<String> it = files.iterator();
+		while (it.hasNext()) {
+			String current = it.next();
+			if(!current.endsWith(".png") && !current.endsWith("jpg") && !current.endsWith("jpeg"))
+				it.remove();
+		}
 	}
 
 	public static boolean different(int color1, int color2) {
@@ -335,6 +341,5 @@ public class Scallop extends ApplicationAdapter {
 				dest8.dispose();
 			}
 		}
-		Gdx.app.exit();
 	}
 }
