@@ -4,7 +4,7 @@ buildscript {
 		mavenCentral()
 		google()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-		jcenter()
+		gradlePluginPortal()
 	}
 	dependencies {
 
@@ -18,7 +18,7 @@ allprojects {
 
 configure(subprojects) {
 	apply plugin: 'java-library'
-	sourceCompatibility = 8.0
+	sourceCompatibility = 1.8
 	compileJava {
 		options.incremental = true
 	}
@@ -32,7 +32,6 @@ subprojects {
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://jitpack.io' }
-		jcenter()
 	}
 }
 
