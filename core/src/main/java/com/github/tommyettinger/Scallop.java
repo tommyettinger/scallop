@@ -299,13 +299,13 @@ public class Scallop extends ApplicationAdapter {
 			scale3(dest2, dest6);
 			scale2(dest4, dest8);
 			if(palette != null){
-//				palette.setDitherStrength(0.5f);
-				palette.reduceScatter(source);
-				palette.reduceScatter(dest2);
-				palette.reduceScatter(dest3);
-				palette.reduceScatter(dest4);
-				palette.reduceScatter(dest6);
-				palette.reduceScatter(dest8);
+				palette.setDitherStrength(0.5f);
+				palette.reduceWoven(source);
+				palette.reduceWoven(dest2);
+				palette.reduceWoven(dest3);
+				palette.reduceWoven(dest4);
+				palette.reduceWoven(dest6);
+				palette.reduceWoven(dest8);
 			}
 			try {
 				if(isAbsolute) {
