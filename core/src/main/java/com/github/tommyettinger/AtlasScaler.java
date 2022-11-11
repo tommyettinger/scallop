@@ -7,13 +7,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AtlasScaler extends ApplicationAdapter {
     public Array<String> atlases, fonts;
+    public AtomicInteger currentlyRunning;
 
-    public AtlasScaler(String[] filenames) {
+    public AtlasScaler(String[] filenames, AtomicInteger running) {
+        currentlyRunning = running;
+        currentlyRunning.incrementAndGet();
         atlases = new Array<>(filenames.length);
         fonts = new Array<>(filenames.length);
         for (int i = 0; i < filenames.length; i++) {
@@ -24,13 +28,18 @@ public class AtlasScaler extends ApplicationAdapter {
         }
     }
 
-    public FileHandle load(String name) {
-        FileHandle fh = Gdx.files.local(name);
-        if(fh.exists()) return fh;
-        fh = Gdx.files.absolute(name);
-        if(fh.exists()) return fh;
-        return null;
+//    public FileHandle load(String name) {
+//        FileHandle fh = Gdx.files.local(name);
+//        if(fh.exists()) return fh;
+//        fh = Gdx.files.absolute(name);
+//        if(fh.exists()) return fh;
+//        return null;
+//    }
+    public FileHandle load(String s) {
+        boolean isAbsolute = s.matches(".*[/\\\\].*");
+        return isAbsolute ? Gdx.files.absolute(s) : Gdx.files.local(s);
     }
+
 
     @Override
     public void create() {
@@ -125,8 +134,6 @@ public class AtlasScaler extends ApplicationAdapter {
 
             }
         }
-//        Gdx.app.postRunnable(() -> {
-//            System.exit(0);
-//        });
+        if(currentlyRunning.decrementAndGet() <= 0) System.exit(0);
     }
 }

@@ -11,13 +11,17 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.tommyettinger.anim8.PaletteReducer.OKLAB;
 
 public class Scallop extends ApplicationAdapter {
 	public Array<String> files;
 	public PaletteReducer palette;
-	public Scallop(String[] filenames) {
+	public AtomicInteger currentlyRunning;
+	public Scallop(String[] filenames, AtomicInteger running) {
+		currentlyRunning = running;
+		currentlyRunning.incrementAndGet();
 		files = new Array<>(filenames);
 		IntSet colors = new IntSet(256);
 		colors.add(0);
@@ -284,7 +288,6 @@ public class Scallop extends ApplicationAdapter {
 		boolean isAbsolute = s.matches(".*[/\\\\].*");
 		FileHandle fh = isAbsolute ? Gdx.files.absolute(s) : Gdx.files.local(s);
 		return new Pixmap(fh);
-
 	}
 	
 	public void create() {
@@ -341,5 +344,6 @@ public class Scallop extends ApplicationAdapter {
 				dest8.dispose();
 			}
 		}
+		if(currentlyRunning.decrementAndGet() <= 0) System.exit(0);
 	}
 }

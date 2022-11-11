@@ -5,11 +5,14 @@ import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.github.tommyettinger.AtlasScaler;
 import com.github.tommyettinger.Scallop;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /** Launches the desktop (headless) application. */
 public class ScallopLauncher {
-	public static void main(String[] args) { 
-		new HeadlessApplication(new Scallop(args), getDefaultConfiguration());
-		new HeadlessApplication(new AtlasScaler(args), getDefaultConfiguration());
+	public static void main(String[] args) {
+		AtomicInteger runCount = new AtomicInteger(0);
+		new HeadlessApplication(new Scallop(args, runCount), getDefaultConfiguration());
+		new HeadlessApplication(new AtlasScaler(args, runCount), getDefaultConfiguration());
 	}
 
 	private static HeadlessApplicationConfiguration getDefaultConfiguration() {
