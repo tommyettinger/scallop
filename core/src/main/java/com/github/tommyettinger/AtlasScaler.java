@@ -63,7 +63,7 @@ public class AtlasScaler extends ApplicationAdapter {
             String text = original.readString("UTF8");
             TextureAtlas.TextureAtlasData atlas = new TextureAtlas.TextureAtlasData(original, original.parent(), false);
             Array<TextureAtlas.TextureAtlasData.Page> pages = atlas.getPages();
-            for (int n : new int[]{2, 3, 4, 6, 8}) {
+            for (int n : new int[]{1, 2, 3, 4, 6, 8}) {
                 String outputName = (original.pathWithoutExtension() + "-x" + n + ".atlas");
                 FileHandle output;
                 if(original.type() == Files.FileType.Local)
@@ -105,7 +105,7 @@ public class AtlasScaler extends ApplicationAdapter {
             FileHandle original = load(name);
             if (original == null) continue;
             String text = original.readString("UTF8");
-            for (int n : new int[]{2, 3, 4, 6, 8}) {
+            for (int n : new int[]{1, 2, 3, 4, 6, 8}) {
                 String outputName = (original.pathWithoutExtension() + "-x" + n + ".fnt");
                 FileHandle output;
                 if (original.type() == Files.FileType.Local)
