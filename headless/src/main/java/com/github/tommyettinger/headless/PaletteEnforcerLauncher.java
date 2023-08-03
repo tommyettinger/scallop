@@ -11,7 +11,6 @@ public class PaletteEnforcerLauncher {
 	}
 
 	private static HeadlessApplicationConfiguration getDefaultConfiguration() {
-		HeadlessApplicationConfiguration configuration = new HeadlessApplicationConfiguration();
-		return configuration;
+		return new HeadlessApplicationConfiguration();
 	}
 }

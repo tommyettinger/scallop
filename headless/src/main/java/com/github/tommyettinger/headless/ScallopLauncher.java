@@ -10,9 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /** Launches the desktop (headless) application. */
 public class ScallopLauncher {
 	public static void main(String[] args) {
-		AtomicInteger runCount = new AtomicInteger(0);
-		new HeadlessApplication(new Scallop(args, runCount), getDefaultConfiguration());
-		new HeadlessApplication(new AtlasScaler(args, runCount), getDefaultConfiguration());
+		final AtomicInteger runCount = new AtomicInteger(0);
+		final HeadlessApplicationConfiguration config = getDefaultConfiguration();
+		new HeadlessApplication(new Scallop(args, runCount), config);
+		new HeadlessApplication(new AtlasScaler(args, runCount), config);
 	}
 
 	private static HeadlessApplicationConfiguration getDefaultConfiguration() {

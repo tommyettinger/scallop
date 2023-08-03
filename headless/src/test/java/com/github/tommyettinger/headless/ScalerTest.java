@@ -11,8 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ScalerTest {
 	public static void main(String[] args) {
 		AtomicInteger runCount = new AtomicInteger(0);
-		new HeadlessApplication(new Scallop(new String[]{"Dawnlike.atlas", "Dawnlike.png", "Eye_Tyrant.png", "font.fnt"}, runCount), getDefaultConfiguration());
-		new HeadlessApplication(new AtlasScaler(new String[]{"Dawnlike.atlas", "Dawnlike.png", "Eye_Tyrant.png", "font.fnt"}, runCount), getDefaultConfiguration());
+		HeadlessApplicationConfiguration config = getDefaultConfiguration();
+		new HeadlessApplication(new Scallop(new String[]{"Dawnlike.atlas", "Dawnlike.png", "Eye_Tyrant.png", "font.fnt"}, runCount), config);
+		new HeadlessApplication(new AtlasScaler(new String[]{"Dawnlike.atlas", "Dawnlike.png", "Eye_Tyrant.png", "font.fnt"}, runCount), config);
 	}
 
 	private static HeadlessApplicationConfiguration getDefaultConfiguration() {
