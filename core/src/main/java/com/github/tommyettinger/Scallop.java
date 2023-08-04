@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.IntSet;
 import com.github.tommyettinger.anim8.PaletteReducer;
 
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -98,40 +99,46 @@ public class Scallop extends ApplicationAdapter {
 //	}
 	public static void scale2(Pixmap src, Pixmap dest) {
 
-		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
+		final int width = src.getWidth() - 1, height = src.getHeight() - 1,
+				sw = src.getWidth(), sh = src.getHeight(),
+				dw = dest.getWidth(), dh = dest.getHeight();
+		ByteBuffer sp = src.getPixels();
+		((Buffer)sp).rewind();
 		ByteBuffer pixels = dest.getPixels();
-
+		((Buffer)pixels).rewind();
+		
 		for (int y = 0; y <= height; ++y) {
 			for (int x = 0; x <= width; ++x) {
 				int p0, p1, p2, p3;
 				int A, B, C, D, E, F, G, H, I;
 
-				A = x == 0 || y == 0 ? 0 : src.getPixel(x - 1, y - 1);
-				B = y == 0 ? 0 : src.getPixel(x, y - 1);
-				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
-				D = x == 0 ? 0 : src.getPixel(x - 1, y);
-				E = src.getPixel(x, y);
-				F = x == width ? 0 : src.getPixel(x + 1, y);
-				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
-				H = y == height ? 0 : src.getPixel(x, y + 1);
-				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
+				A = x == 0 || y == 0 ? 0 : sp.getInt((x - 1 + sw * (y - 1)) << 2);
+				B = y == 0 ? 0 : sp.getInt((x + sw * (y - 1)) << 2);
+				C = y == 0 || x == width ? 0 : sp.getInt((x + 1 + sw * (y - 1)) << 2);
+				D = x == 0 ? 0 : sp.getInt((x - 1 + sw * y) << 2);
+				E = sp.getInt((x + sw * y) << 2);
+				F = x == width ? 0 : sp.getInt((x + 1 + sw * y) << 2);
+				G = x == 0 || y == height ? 0 : sp.getInt((x - 1 + sw * (y + 1)) << 2);
+				H = y == height ? 0 : sp.getInt((x + sw * (y + 1)) << 2);
+				I = x == width || y == height ? 0 : sp.getInt((x + 1 + sw * (y + 1)) << 2);
 
 				p0 = (y * dw + x << 1) << 2;
 				p1 = (y * dw + x << 1 | 1) << 2;
-				p2 = ((y * dw + x << 1) + dw) << 2;
-				p3 = ((y * dw + x << 1 | 1) + dw) << 2;
+				p2 = (y * dw + x << 1) + dw << 2;
+				p3 = (y * dw + x << 1 | 1) + dw << 2;
 
 				scale2p(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3);
 			}
 		}
+		((Buffer)pixels).rewind();
 
 		for (int y = 1; y < dh; y++) {
 			for (int x = 1; x < dw; x++) {
 				int p0, p1, p2, p3, c0, c1, c2, c3;
 				c0 = pixels.getInt(p0 = (y * dw + x - 1 - dw) << 2);
 				c1 = pixels.getInt(p1 = (y * dw + x - dw) << 2);
-				c2 = pixels.getInt(p2 = ((y * dw + x - 1)) << 2);
-				c3 = pixels.getInt(p3 = ((y * dw + x)) << 2);
+				c2 = pixels.getInt(p2 = (y * dw + x - 1) << 2);
+				c3 = pixels.getInt(p3 = (y * dw + x) << 2);
 				if (c0 == c3 && c1 == c2 && c0 != c1)
 				{
 					c3 = (brightness(c0) > brightness(c1) ? c0 : c1);
@@ -155,23 +162,28 @@ public class Scallop extends ApplicationAdapter {
 	}
 	public static void scale3(Pixmap src, Pixmap dest) {
 
-		final int width = src.getWidth() - 1, height = src.getHeight() - 1, dw = dest.getWidth(), dh = dest.getHeight();
+		final int width = src.getWidth() - 1, height = src.getHeight() - 1,
+				sw = src.getWidth(), sh = src.getHeight(),
+				dw = dest.getWidth(), dh = dest.getHeight();
+		ByteBuffer sp = src.getPixels();
+		((Buffer)sp).rewind();
 		ByteBuffer pixels = dest.getPixels();
+		((Buffer)pixels).rewind();
 
 		for (int y = 0; y <= height; ++y) {
 			for (int x = 0; x <= width; ++x) {
 				int p0, p1, p2, p3, p4, p5, p6, p7, p8;
 				int A, B, C, D, E, F, G, H, I;
 
-				A = x == 0 || y == 0 ? 0 : src.getPixel(x - 1, y - 1);
-				B = y == 0 ? 0 : src.getPixel(x, y - 1);
-				C = y == 0 || x == width ? 0 : src.getPixel(x + 1, y - 1);
-				D = x == 0 ? 0 : src.getPixel(x - 1, y);
-				E = src.getPixel(x, y);
-				F = x == width ? 0 : src.getPixel(x + 1, y);
-				G = x == 0 || y == height ? 0 : src.getPixel(x - 1, y + 1);
-				H = y == height ? 0 : src.getPixel(x, y + 1);
-				I = x == width || y == height ? 0 : src.getPixel(x + 1, y + 1);
+				A = x == 0 || y == 0 ? 0 : sp.getInt((x - 1 + sw * (y - 1)) << 2);
+				B = y == 0 ? 0 : sp.getInt((x + sw * (y - 1)) << 2);
+				C = y == 0 || x == width ? 0 : sp.getInt((x + 1 + sw * (y - 1)) << 2);
+				D = x == 0 ? 0 : sp.getInt((x - 1 + sw * (y)) << 2);
+				E = sp.getInt((x + sw * (y)) << 2);
+				F = x == width ? 0 : sp.getInt((x + 1 + sw * (y)) << 2);
+				G = x == 0 || y == height ? 0 : sp.getInt((x - 1 + sw * (y + 1)) << 2);
+				H = y == height ? 0 : sp.getInt((x + sw * (y + 1)) << 2);
+				I = x == width || y == height ? 0 : sp.getInt((x + 1 + sw * (y + 1)) << 2);
 
 				p0 = (y * dw + x) * 3 << 2;
 				p1 = (y * dw + x) * 3 + 1 << 2;
@@ -186,6 +198,7 @@ public class Scallop extends ApplicationAdapter {
 				scale3p(pixels, A, B, C, D, E, F, G, H, I, p0, p1, p2, p3, p4, p5, p6, p7, p8);
 			}
 		}
+		((Buffer)pixels).rewind();
 
 		for (int y = 1; y < dh; y++) {
 			for (int x = 1; x < dw; x++) {
