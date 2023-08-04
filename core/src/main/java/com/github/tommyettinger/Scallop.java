@@ -14,8 +14,6 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.github.tommyettinger.anim8.PaletteReducer.OKLAB;
-
 public class Scallop extends ApplicationAdapter {
 	public Array<String> files;
 	public PaletteReducer palette;
@@ -47,14 +45,16 @@ public class Scallop extends ApplicationAdapter {
 	}
 
 	public static boolean different(int color1, int color2) {
-		if (((color1 ^ color2) & 0x80) == 0x80) return true;
-		final int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
-				indexB = (color2 >>> 17 & 0x7C00) | (color2 >>> 14 & 0x3E0) | (color2 >>> 11 & 0x1F);
-		final double
-				L = OKLAB[0][indexA] - OKLAB[0][indexB],
-				A = OKLAB[1][indexA] - OKLAB[1][indexB],
-				B = OKLAB[2][indexA] - OKLAB[2][indexB];
-		return (L * L + A * A + B * B) >= 0.01;
+		return ((color1 & 0xF8F8F880) != (color2 & 0xF8F8F880));
+
+//		if (((color1 ^ color2) & 0x80) == 0x80) return true;
+//		final int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
+//				indexB = (color2 >>> 17 & 0x7C00) | (color2 >>> 14 & 0x3E0) | (color2 >>> 11 & 0x1F);
+//		final double
+//				L = OKLAB[0][indexA] - OKLAB[0][indexB],
+//				A = OKLAB[1][indexA] - OKLAB[1][indexB],
+//				B = OKLAB[2][indexA] - OKLAB[2][indexB];
+//		return (L * L + A * A + B * B) >= 0.01;
 	}
 
 		public static void scale2p(ByteBuffer dest, int A, int B, int C, int D, int E, int F, int G, int H, int I, int p0, int p1,
@@ -87,8 +87,9 @@ public class Scallop extends ApplicationAdapter {
 		dest.putInt(p8, F != 0 && ((!different(H, F) && different(D, H) && different(B, F)) || (E == 0 && H != 0)) ? F : E);
 	}
 
-	public static double brightness(int rgba) {
-		return OKLAB[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
+	public static int brightness(int rgba) {
+		return (rgba << 24 | rgba >> 8) & 0xFEFFFFFF;
+//		return OKLAB[0][PaletteReducer.shrink(rgba)] * (rgba & 0xFE);
 	}
 //
 //	public static int brightness(int rgba) {
@@ -321,13 +322,13 @@ public class Scallop extends ApplicationAdapter {
 			scale3(dest2, dest6);
 			scale2(dest4, dest8);
 			if(palette != null){
-				palette.setDitherStrength(0.5f);
-				palette.reduceWoven(source);
-				palette.reduceWoven(dest2);
-				palette.reduceWoven(dest3);
-				palette.reduceWoven(dest4);
-				palette.reduceWoven(dest6);
-				palette.reduceWoven(dest8);
+				palette.setDitherStrength(1f);
+				palette.reduceLoaf(source);
+				palette.reduceLoaf(dest2);
+				palette.reduceLoaf(dest3);
+				palette.reduceLoaf(dest4);
+				palette.reduceLoaf(dest6);
+				palette.reduceLoaf(dest8);
 			}
 			try {
 				if(isAbsolute) {
