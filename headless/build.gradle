@@ -1,7 +1,8 @@
 apply plugin: 'application'
 
 //mainClassName = 'com.github.tommyettinger.headless.PaletteEnforcerLauncher'
-mainClassName = 'com.github.tommyettinger.headless.ScallopLauncher'
+//mainClassName = 'com.github.tommyettinger.headless.ScallopLauncher'
+mainClassName = 'com.github.tommyettinger.headless.ScaleneLauncher'
 eclipse.project.name = appName + '-headless'
 sourceCompatibility = 1.8
 
@@ -12,7 +13,7 @@ dependencies {
 }
 
 jar {
-	archiveFileName.set(appName+".jar")
+	archiveFileName.set("Scalene.jar")
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	dependsOn configurations.runtimeClasspath
 	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
